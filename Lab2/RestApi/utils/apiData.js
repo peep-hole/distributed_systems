@@ -6,6 +6,18 @@ const apiData = (apiType, question, callback) => {
 
         const url = constants.api2.BASE_URL + question
 
+        request({url, json: true}, (error) => {
+            if (error) {
+                callback(undefined, {
+                    info1: "Service is unavailable. Please try again later",
+                    info2: "",
+                    info3: ""
+                    
+                })
+            }
+
+        })
+
         request({url, json: true}, (error, {body}) => {
 
             if(error) {
@@ -53,6 +65,18 @@ const apiData = (apiType, question, callback) => {
     } else {
         const url = constants.api1.BASE_URL + question +"&from=2022-02-10&sortBy=publishedAt&apiKey=" + constants.api1.SECRET_KEY
         
+        request({url, json: true}, (error) => {
+            if (error) {
+                callback(undefined, {
+                    info1: "Service is unavailable. Please try again later",
+                    info2: "",
+                    info3: ""
+                    
+                })
+            }
+
+        })
+
         request({url, json: true}, (error, {body}) => {
             if (error) {
                 callback("Can't fetch data from open weather map api", undefined)
