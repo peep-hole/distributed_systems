@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{title}}</title>
+    </head>
+    <body>
+        <div class="main-content">
+            {{>header}}
+            <article class="widget">
+                <form class="querry"><input placeholder="ask something..." type = "text"/><button>Search</button>
+                </form>
+                <div class="dropdown">
+                    <label for="api-type">Choose api type:</label>
+                    <select name="api-type" id="api-type">
+                        <option value="api1">News</option>
+                        <option value="api2">DrinksApi</option>
+                    </select>
+                </div>
+
+                <div class="apiInfo">
+                    <div class="info1"><span></span></div>
+                    <div class="info2"></div>
+                    <div class="info3"></div>
+                </div>
+
+            </article>
+        </div>
+        <script src="js/client.js"></script>
+    </body>
+</html>
