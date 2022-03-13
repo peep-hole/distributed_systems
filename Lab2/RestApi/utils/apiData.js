@@ -21,7 +21,7 @@ const apiData = (apiType, question, callback) => {
         request({url, json: true}, (error, {body}) => {
 
             if(error) {
-                callback("Can't fetch data from open weather map api", undefined)
+                callback("Can't fetch data from api", undefined)
             } else if (!body.drinks) {
                 callback(undefined, {
                     info1: "Can't find such drink in database, please try again...",
@@ -63,7 +63,7 @@ const apiData = (apiType, question, callback) => {
             
         })
     } else {
-        const url = constants.api1.BASE_URL + question +"&from=2022-02-10&sortBy=publishedAt&apiKey=" + constants.api1.SECRET_KEY
+        const url = constants.api1.BASE_URL + question +"&from=2022-03-10&sortBy=publishedAt&apiKey=" + constants.api1.SECRET_KEY
         
         request({url, json: true}, (error) => {
             if (error) {
@@ -79,7 +79,7 @@ const apiData = (apiType, question, callback) => {
 
         request({url, json: true}, (error, {body}) => {
             if (error) {
-                callback("Can't fetch data from open weather map api", undefined)
+                callback("Can't fetch data from api", undefined)
             }else if (body.totalResults === 0) {
                 callback(undefined, {
                     info1: "Can't find anything about what you ask, please try again...",
