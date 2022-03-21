@@ -80,6 +80,13 @@ const apiData = (apiType, question, callback) => {
         request({url, json: true}, (error, {body}) => {
             if (error) {
                 callback("Can't fetch data from api", undefined)
+            }else if (body.status == 'error'){
+                callback(undefined, {
+                    info1: "API Service is probably down, try again later...",
+                    info2: "",
+                    info3: "" 
+                })
+                
             }else if (body.totalResults === 0) {
                 callback(undefined, {
                     info1: "Can't find anything about what you ask, please try again...",
