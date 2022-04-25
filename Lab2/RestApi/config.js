@@ -1,6 +1,6 @@
 const constants = {
     api1: {
-        BASE_URL: "https://newsapi.org/v2/everything?q=",
+        BASE_URL: "https://newpi.org/v2/everything?q=",
         SECRET_KEY: "26fddf17dcb14c7f8e8726fec334855d"
     },
     api2 : {
