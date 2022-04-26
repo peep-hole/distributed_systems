@@ -67,7 +67,21 @@ public class App {
         /// TASK 3 - Reactive Streams in Akka Streams
 //        final ActorSystem streamSystem = ActorSystem.create(Behaviors.empty(), "streams");
 //        final Materializer materializer = Materializer.createMaterializer(streamSystem);
-
+//
+//        final Source<Integer, NotUsed> source = Source.range(1, 100);
+//
+//
+//
+//        final Flow<Integer, String, NotUsed> debugFlow = Flow.fromFunction((Integer n) -> {
+//            System.out.println("DEBUG FLOW: " + n);
+//            return n.toString();
+//        });
+//
+//        final Sink<String, CompletionStage<Done>> slowSink = Sink.foreach(str-> {
+//            Thread.sleep(1000);
+//            System.out.println("DEBUG SINK: ---> " + str);
+//
+//        });
 
 
         // STRATEGIES
@@ -76,14 +90,14 @@ public class App {
         // BACK PRESSURE
         // If the buffer is full when a new element is available this strategy backpressures the upstream publisher until space becomes available in the buffer.
 
-//        final Source<Integer, NotUsed> source = Source.range(1, 100).buffer(16, OverflowStrategy.backpressure());
+//        final RunnableGraph<NotUsed> runnableGraph = source.via(debugFlow).buffer(5, OverflowStrategy.backpressure()).async().to(slowSink);
 
 
         // STRATEGY 2
         // DROP TAIL
         // If the buffer is full when a new element arrives, drops the youngest element from the buffer to make space for the new element
 
-//        final Source<Integer, NotUsed> source = Source.range(1, 100).buffer(16, OverflowStrategy.dropTail());
+//        final RunnableGraph<NotUsed> runnableGraph = source.via(debugFlow).buffer(16, OverflowStrategy.dropTail()).async().to(slowSink);
 
 
 
@@ -91,7 +105,7 @@ public class App {
         // DROP HEAD
         // If the buffer is full when a new element arrives, drops the oldest element from the buffer to make space for the new element.
 
-//        final Source<Integer, NotUsed> source = Source.range(1, 100).buffer(16, OverflowStrategy.dropHead());
+//        final RunnableGraph<NotUsed> runnableGraph = source.via(debugFlow).buffer(5, OverflowStrategy.dropHead()).async().to(slowSink);
 
 
 
@@ -99,21 +113,9 @@ public class App {
         // FAIL
         // If the buffer is full when a new element is available this strategy completes the stream with failure
 
-//        final Source<Integer, NotUsed> source = Source.range(1, 100).buffer(16, OverflowStrategy.fail());
+//        final RunnableGraph<NotUsed> runnableGraph = source.via(debugFlow).buffer(16, OverflowStrategy.fail()).async().to(slowSink);
 
 
-//        final Flow<Integer, String, NotUsed> debugFlow = Flow.fromFunction((Integer n) -> {
-//            System.out.println("DEBUG FLOW: " + n);
-//            return n.toString();
-//        }).async();
-//
-//        final Sink<String, CompletionStage<Done>> slowSink = Sink.foreach(str-> {
-//            Thread.sleep(1000);
-//            System.out.println("DEBUG SINK: ---> " + str);
-//
-//        });
-//
-//        final RunnableGraph<NotUsed> runnableGraph = source.via(debugFlow).to(slowSink);
 //        runnableGraph.run(materializer);
 
 
@@ -133,36 +135,36 @@ public class App {
         // how to create
 
 
-//        // source
-//        final Source<Integer, NotUsed> dslInput = Source.range(1, 100);
-//
-//        //sink
-//        final Sink<Pair<Integer, Integer>, CompletionStage<Done>> dslSink = Sink.foreach(System.out::println);
-//
-//        //flows
-//        final Flow<Integer, Integer, NotUsed> addFlow = Flow.of(Integer.class).map(integer -> integer + 1);
-//        final Flow<Integer, Integer, NotUsed> multiFlow = Flow.of(Integer.class).map(integer -> integer * 10);
-//
-//        // dsl graph
-//        final Graph<ClosedShape, CompletionStage<Done>> graph = GraphDSL.create(dslSink, (builder, out) -> {
-//            final UniformFanOutShape<Integer, Integer> bcast = builder.add(Broadcast.create(2));
-//            final FanInShape2<Integer, Integer, Pair<Integer, Integer>> zip = builder.add(Zip.create());
-//            final Outlet<Integer> source = builder.add(dslInput).out();
-//
-//            builder.from(source).toFanOut(bcast);
-//            builder.from(bcast).via(builder.add(addFlow)).toInlet(zip.in0());
-//            builder.from(bcast).via(builder.add(multiFlow)).toInlet(zip.in1());
-//            builder.from(zip.out()).to(out);
-//
-//            return ClosedShape.getInstance();
-//        });
-//
-//        // actor system
-//        final ActorSystem dslSystem = ActorSystem.create(Behaviors.empty(), "dsl");
-//
-//        // materializer
-//        final Materializer dslMaterializer = Materializer.createMaterializer(dslSystem);
-//        RunnableGraph.fromGraph(graph).run(dslMaterializer);
+        // source
+        final Source<Integer, NotUsed> dslInput = Source.range(1, 100);
+
+        //sink
+        final Sink<Pair<Integer, Integer>, CompletionStage<Done>> dslSink = Sink.foreach(System.out::println);
+
+        //flows
+        final Flow<Integer, Integer, NotUsed> addFlow = Flow.of(Integer.class).map(integer -> integer + 1);
+        final Flow<Integer, Integer, NotUsed> multiFlow = Flow.of(Integer.class).map(integer -> integer * 10);
+
+        // dsl graph
+        final Graph<ClosedShape, CompletionStage<Done>> graph = GraphDSL.create(dslSink, (builder, out) -> {
+            final UniformFanOutShape<Integer, Integer> bcast = builder.add(Broadcast.create(2));
+            final FanInShape2<Integer, Integer, Pair<Integer, Integer>> zip = builder.add(Zip.create());
+            final Outlet<Integer> source = builder.add(dslInput).out();
+
+            builder.from(source).toFanOut(bcast);
+            builder.from(bcast).via(builder.add(addFlow)).toInlet(zip.in0());
+            builder.from(bcast).via(builder.add(multiFlow)).toInlet(zip.in1());
+            builder.from(zip.out()).to(out);
+
+            return ClosedShape.getInstance();
+        });
+
+        // actor system
+        final ActorSystem dslSystem = ActorSystem.create(Behaviors.empty(), "dsl");
+
+        // materializer
+        final Materializer dslMaterializer = Materializer.createMaterializer(dslSystem);
+        RunnableGraph.fromGraph(graph).run(dslMaterializer);
 
 
         try {
